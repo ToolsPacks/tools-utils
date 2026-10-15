@@ -9,7 +9,7 @@
 用于给前端或外部系统颁发限时直传/下载凭证。支持自动处理 `write_domain` (上传专线) 与 `read_domain` (CDN分发) 的跨域签名映射。
 
 ```php
-use app\utils\Storage\OssClient;
+use app\utils\CloudStorage\OssClient;
 
 $config = [
     'type' => 'cloudflare_r2', // 支持 s3, aliyun, tencent, cloudflare_r2, feiniuos, qiniu
@@ -28,7 +28,7 @@ $url = OssClient::getPresignedUrl($config, 'PUT', 'user/2026/demo.mp4', 3600);
 在处理超过 100MB 的文件时，**严禁使用** `putObject` 读入内存。必须使用 `putObjectFromFile` 利用底层 `fopen` 句柄进行推流。
 
 ```php
-use app\utils\Storage\S3Helper;
+use app\utils\CloudStorage\S3Helper;
 
 // 内部采用 UNSIGNED-PAYLOAD 绕过大文件哈希计算，降低 CPU 消耗
 $url = S3Helper::putObjectFromFile($config, 'backup/db.sql', '/tmp/local_db.sql');
