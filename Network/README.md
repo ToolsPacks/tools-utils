@@ -1,11 +1,9 @@
 # toolspacks/utils / Network (底层网络通信引擎)
 
-## 📌 模块定位
+## 模块定位
 为 toolspacks/utils 提供最底层的网络请求能力。
 
----
-
-## 🚀 核心 API 调用范例
+## 核心 API 调用范例
 
 ### 1. 极致轻量化的 `HttpHelper`
 专门用来调用 JSON RESTful API，免去了 Guzzle 的笨重实例化过程。
@@ -13,7 +11,7 @@
 ```php
 use app\utils\Network\HttpHelper;
 
-$url = '[https://api.example.com/data](https://api.example.com/data)';
+$url = 'https://api.example.com/data';
 $payload = ['key' => 'value'];
 $customHeaders = [
     'Authorization: Bearer Token_123',
@@ -21,8 +19,9 @@ $customHeaders = [
 ];
 
 try {
-    // 参数：URL, 数据, 超时秒数, 自定义 Header
-    $response = HttpHelper::postJson($url, $payload, 10, $customHeaders);
+    // 参数：URL, 数据, 超时秒数, 自定义 Header, 是否校验证书
+    // 对接公网 HTTPS 端点时最后一个参数必须传 true
+    $response = HttpHelper::postJson($url, $payload, 10, $customHeaders, true);
     // 成功返回 string，失败抛出 Exception
 } catch (\Exception $e) {
     echo "请求崩溃: " . $e->getMessage();
@@ -48,6 +47,8 @@ try {
 }
 ```
 
-## ⚠️ 开发注意事项 (AI 避坑指南)
-1. **证书阻断处理**：`HttpHelper` 默认配置了 `CURLOPT_SSL_VERIFYPEER = false`。由于云盘经常要对接一些使用内网自签证书、或过期证书的加速节点，这一配置**绝对不允许修改**为 `true`，否则会导致底层大面积通信阻断。
-2. **编码问题**：`SmtpHelper` 内部已经对标题进行了 `=?UTF-8?B?...?=` 的标准编码。调用端直接传中文即可，**不要自己做 base64 转换**，否则会引发二次乱码。
+## 注意事项
+
+证书校验：`HttpHelper` 的 `verifySsl` 参数默认 `false`，用于兼容内网自签证书或证书已过期的加速节点，这是历史默认值，未传参的调用方行为不变。连接公网 HTTPS 端点时必须显式传 `true`，否则请求可被中间人攻击。
+
+编码：`SmtpHelper` 内部已按 `=?UTF-8?B?...?=` 标准编码邮件标题。调用端直接传中文即可，不要自行做 base64 转换，否则会引发二次乱码。

@@ -86,7 +86,9 @@ class S3Helper
         curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // 由配置项 verify_ssl 控制，缺省 false 保持既有内网/自签证书场景行为；
+        // 对接公网端点时必须显式传入 verify_ssl = true。
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (bool)($config['verify_ssl'] ?? false));
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
         $response = curl_exec($ch);
@@ -195,7 +197,9 @@ class S3Helper
         curl_setopt($ch, CURLOPT_INFILESIZE, $fileSize);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // 由配置项 verify_ssl 控制，缺省 false 保持既有内网/自签证书场景行为；
+        // 对接公网端点时必须显式传入 verify_ssl = true。
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (bool)($config['verify_ssl'] ?? false));
         curl_setopt($ch, CURLOPT_TIMEOUT, 86400);
 
         try {

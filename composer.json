@@ -4,7 +4,13 @@
   "type": "library",
   "license": "proprietary",
   "require": {
-    "php": ">=8.2.0"
+    "php": ">=8.2.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-zlib": "*",
+    "topthink/framework": "^8.0"
   },
   "autoload": {
     "psr-4": {
@@ -12,6 +18,6 @@
     }
   },
   "suggest": {
-    "topthink/framework": "Cache/Console/Queue/Log facade 由宿主框架提供，本包不做硬依赖"
+    "ext-redis": "Concurrency/LockHelper 与 Sls/SlsQueueHelper 依赖 Redis 扩展；不使用这两个模块时无需安装"
   }
 }

@@ -440,7 +440,9 @@ class OssClient
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // 由配置项 verify_ssl 控制，缺省 false 保持既有内网/自签证书场景行为；
+        // 对接公网端点时必须显式传入 verify_ssl = true。
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (bool)($config['verify_ssl'] ?? false));
         curl_setopt($ch, CURLOPT_TIMEOUT, $isFile ? 86400 : 30); // 稍微放宽普通 API 请求的超时
 
         // 【核心修复】：为 POST 请求配置 CURLOPT_POSTFIELDS 发送数据载荷
@@ -507,7 +509,9 @@ class OssClient
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // 由配置项 verify_ssl 控制，缺省 false 保持既有内网/自签证书场景行为；
+        // 对接公网端点时必须显式传入 verify_ssl = true。
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (bool)($config['verify_ssl'] ?? false));
         curl_setopt($ch, CURLOPT_TIMEOUT, $isFile ? 86400 : 15);
 
         if ($method === 'PUT' || $method === 'POST') {

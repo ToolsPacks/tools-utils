@@ -1,11 +1,9 @@
 # toolspacks/utils / CloudStorage (云原生存储底层驱动)
 
-## 📌 模块定位
-直接对各大厂商（Aliyun, Tencent, Cloudflare R2, AWS S3）的 Bucket 发起原生 HTTP 指令。**此包严禁包含任何 ThinkPHP 专属逻辑（如 `Db::` 门面），确保其极致的纯净性与可移植性。**
+## 模块定位
+直接对各大厂商（Aliyun, Tencent, Cloudflare R2, AWS S3）的 Bucket 发起原生 HTTP 指令，不引入任何第三方云存储 SDK。异常日志依赖框架的 `Log` facade，除日志外本模块不涉及 ThinkPHP 专属逻辑。
 
----
-
-## 🚀 核心 API 调用范例
+## 核心 API 调用范例
 
 ### 0. 标准化 Config 字典
 所有的类方法都需要传入这个标准数组：
@@ -19,7 +17,8 @@ $config = [
     'region'       => 'auto', 
     'write_domain' => 'upload.example.com', 
     'read_domain'  => 'cdn.example.com',
-    'cdn_auth_key' => 'TypeA_or_TypeD_Secret' // CDN防盗链秘钥
+    'cdn_auth_key' => 'TypeA_or_TypeD_Secret', // CDN防盗链秘钥
+    'verify_ssl'   => true // 对接公网端点必须为 true；内网自签证书节点可省略（默认 false）
 ];
 ```
 
@@ -37,7 +36,7 @@ $getUrl = OssClient::getPresignedUrl($config, 'GET', '2026/demo.zip', 14400, '�
 ```
 
 ### 2. S3 流式推流防 OOM (S3Helper)
-**⚠️ 最高安全红线：将服务器本地大文件上传至 OSS，必须使用此方法利用 CURLOPT_INFILE 实现无内存损耗推流！**
+最高安全红线：将服务器本地大文件上传至 OSS，必须使用此方法，它利用 CURLOPT_INFILE 实现无内存损耗推流。
 
 ```php
 use app\utils\CloudStorage\S3Helper;
@@ -70,6 +69,8 @@ $deleted = OssClient::deleteObject($config, '2026/demo.zip');
 OssClient::checkConnection($config);
 ```
 
-## ⚠️ 开发注意事项 (AI 避坑指南)
-1. **纯粹性警告**：严禁在此包内使用 `aws/aws-sdk-php` 或 `guzzlehttp/guzzle`，所有的握手都必须走原生 `cURL` 算法引擎！
-2. **CORS 跨域黑洞**：使用大文件分片引擎合并时，务必提醒运维在云存储 CORS 配置中开启暴露 `ETag` (Expose-Headers: ETag)，否则前端无法截获 ETag 导致合并崩溃。
+## 注意事项
+
+纯粹性：严禁在此模块内引入 `aws/aws-sdk-php` 或 `guzzlehttp/guzzle`，所有握手都走原生 `cURL`。
+
+CORS：使用大文件分片引擎合并时，必须在云存储 CORS 配置中暴露 `ETag`（Expose-Headers: ETag），否则前端拿不到 ETag，合并会失败。
