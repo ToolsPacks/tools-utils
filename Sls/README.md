@@ -1,4 +1,4 @@
-# Wujie-Utils / Sls (高并发异步日志聚合引擎)
+# toolspacks/utils / Sls (高并发异步日志聚合引擎)
 
 ## 📌 架构说明 (AI 开发指引)
 此模块旨在彻底解决 PHP 同步请求外部日志 API 带来的性能灾难。

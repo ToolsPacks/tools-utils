@@ -65,7 +65,8 @@ class SchedulerEngine
                 elseif (!empty($task['class']) && class_exists($task['class'])) {
                     $className = $task['class'];
                     if (is_subclass_of($className, WujieTaskInterface::class)) {
-                        $instance = new $className();
+                        // 交由容器实例化，保证构造函数依赖（如统一账本服务）能被自动注入
+                        $instance = \think\Container::getInstance()->make($className, [], true);
                         $instance->execute();
                     }
                 }

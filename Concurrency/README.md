@@ -1,4 +1,4 @@
-# Wujie-Utils / Concurrency (高并发原子锁)
+# toolspacks/utils / Concurrency (高并发原子锁)
 
 ## 📌 模块定位
 基于 Redis `SETNX` 的防击穿原子锁。在回调处理、支付处理、文件确权时，防止并发请求导致数据库脏写。

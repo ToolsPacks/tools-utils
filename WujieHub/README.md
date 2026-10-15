@@ -1,4 +1,4 @@
-# Wujie-Utils / WujieHub (无界云盘微服务接入 SDK)
+# toolspacks/utils / WujieHub (无界云盘微服务接入 SDK)
 
 ## 📌 模块定位
 本模块专供 **ERP、订单系统、商城** 等外部/内部业务系统调用。通过此 SDK，其他系统无需关心底层 OSS 是阿里云还是 Cloudflare，也无需关心文件大小，直接向无界主控系统发起指令，实现资产的全生命周期集中接管。

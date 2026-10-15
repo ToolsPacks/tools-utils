@@ -1,7 +1,7 @@
-# Wujie-Utils / Network (底层网络通信引擎)
+# toolspacks/utils / Network (底层网络通信引擎)
 
 ## 📌 模块定位
-为 Wujie-Utils 提供最底层的网络请求能力。
+为 toolspacks/utils 提供最底层的网络请求能力。
 
 ---
 

@@ -1,4 +1,4 @@
-# Wujie-Utils / CloudStorage (云原生存储底层驱动)
+# toolspacks/utils / CloudStorage (云原生存储底层驱动)
 
 ## 📌 模块定位
 直接对各大厂商（Aliyun, Tencent, Cloudflare R2, AWS S3）的 Bucket 发起原生 HTTP 指令。**此包严禁包含任何 ThinkPHP 专属逻辑（如 `Db::` 门面），确保其极致的纯净性与可移植性。**
