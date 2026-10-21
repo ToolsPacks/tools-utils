@@ -18,6 +18,14 @@
     }
   },
   "suggest": {
-    "ext-redis": "Concurrency/LockHelper 与 Sls/SlsQueueHelper 依赖 Redis 扩展；不使用这两个模块时无需安装"
+    "ext-redis": "Concurrency/LockHelper 与 Sls/SlsQueueHelper 依赖 Redis 扩展；不使用这两个模块时无需安装",
+    "predis/predis": "宿主未加载 ext-redis 时，ThinkPHP 的 Redis 驱动会退回 Predis 客户端"
+  },
+  "archive": {
+    "exclude": [
+      "/.git",
+      "/.idea",
+      "/tests"
+    ]
   }
 }

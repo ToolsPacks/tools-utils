@@ -21,6 +21,12 @@ Composer 的 PSR-4 按最长前缀匹配，`app\utils\` 优先于项目自身的
 - `HttpHelper::request` / `get` / `postJson` 传入 `verifySsl = true`；
 - 云存储配置数组传入 `'verify_ssl' => true`。
 
+## 并发锁语义
+
+`Concurrency\LockHelper` 同时支持 phpredis 5.x 与 Predis 两种客户端。锁键为 `{cache.stores.redis.prefix}lock:{key}`；Predis 侧前缀由客户端自动追加，包内不再重复拼接。
+
+抢占失败返回 `false`，调用方按普通分支处理；Redis 连接不可用时抛出异常，不退回文件缓存——降级路径没有原子性，会在并发下击穿。解锁走 Lua 校验 token，只有持有者本人能释放。
+
 ## 模块内容
 
 - `Network`：原生 cURL 多功能请求引擎，以及纯 Socket 的 SMTP 发信。
