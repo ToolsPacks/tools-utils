@@ -16,10 +16,13 @@ Composer 的 PSR-4 按最长前缀匹配，`app\utils\` 优先于项目自身的
 
 ## 传输层安全
 
-网络传输默认关闭 TLS 证书校验，用于对接内网自签证书节点。这是既有行为，为不破坏已有调用方而保持不变。对接公网 HTTPS 端点时必须显式开启校验，否则存在中间人攻击风险：
+网络传输默认校验 TLS 证书。1.4.0 之前默认为关闭，用于对接内网自签证书节点；该默认值会把所有公网调用暴露在中间人攻击下，因此已改为默认开启。
 
-- `HttpHelper::request` / `get` / `postJson` 传入 `verifySsl = true`；
-- 云存储配置数组传入 `'verify_ssl' => true`。
+对接自签证书网关时显式关闭校验：
+
+- `HttpHelper::request` / `get` / `postJson` 传入 `verifySsl = false`；
+- 云存储配置数组传入 `'verify_ssl' => false`；
+- `PushMaster\PushClient` 构造时传入 `$verifySsl = false`。
 
 ## 并发锁语义
 
@@ -34,7 +37,7 @@ Composer 的 PSR-4 按最长前缀匹配，`app\utils\` 优先于项目自身的
 - `Concurrency`：基于 Redis 的分布式原子锁。
 - `Sls`：阿里云日志服务批量直发，以及基于 Redis 列表的削峰队列。
 - `Scheduler`：Cron 表达式解析与去中心化调度引擎。
-- `PushMaster`：向 PushMaster 中枢投递推送任务的客户端。
+- `PushMaster`：推送网关客户端，覆盖推送、任务、订阅、模板、指标与结果回调。
 - `WujieHub`：无界云盘接入 SDK。
 - `Invoice`：开票系统对接客户端。
 - 根目录：`ArrayHelper`、`StringHelper`、`ConfigEncryption`、`WujieClient` 门面。

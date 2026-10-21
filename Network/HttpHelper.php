@@ -9,7 +9,7 @@ class HttpHelper
      * 统一多功能原生 cURL 请求引擎 (GET/POST/PUT/DELETE 兼支持 Multipart 文件上传)
      * 完全替代臃肿的 GuzzleHttp，杜绝外部依赖
      */
-    public static function request(string $method, string $url, array|string|object|null $data = null, int $timeout = 10, array $customHeaders = [], bool $verifySsl = false): array
+    public static function request(string $method, string $url, array|string|object|null $data = null, int $timeout = 10, array $customHeaders = [], bool $verifySsl = true): array
     {
         $ch = curl_init($url);
         $method = strtoupper($method);
@@ -17,9 +17,9 @@ class HttpHelper
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, true); // 获取响应头 (用于截获 x-version)
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        // verifySsl 默认 false：保持既有内网/自签证书调用方的行为不变。
-        // 调用公网 HTTPS 端点时必须显式传 true，否则存在中间人攻击风险。
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verifySsl);
+        // 与 VERIFYPEER 保持一致：关闭校验时不再比对证书主机名
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verifySsl ? 2 : 0);
 
         if ($data !== null) {
             // 智能判定是否为 Multipart 文件上传模式
@@ -103,13 +103,13 @@ class HttpHelper
         ];
     }
 
-    public static function get(string $url, array $headers = [], bool $verifySsl = false): string
+    public static function get(string $url, array $headers = [], bool $verifySsl = true, int $timeout = 10): string
     {
-        $res = self::request('GET', $url, null, 10, $headers, $verifySsl);
+        $res = self::request('GET', $url, null, $timeout, $headers, $verifySsl);
         return $res['body'];
     }
 
-    public static function postJson(string $url, array $data, int $timeout = 10, array $customHeaders = [], bool $verifySsl = false): string|bool
+    public static function postJson(string $url, array $data, int $timeout = 10, array $customHeaders = [], bool $verifySsl = true): string|bool
     {
         try {
             $res = self::request('POST', $url, $data, $timeout, $customHeaders, $verifySsl);
