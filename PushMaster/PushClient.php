@@ -269,6 +269,95 @@ class PushClient
     }
 
     /**
+     * 生成微信扫码绑定二维码。
+     *
+     * @param string $externalType 外部对象类型，如 tenant/member
+     * @param string $externalId   外部对象标识
+     * @param string $externalName 展示名，可为空
+     * @param string $appId        指定公众号，空串使用账号下启用的订阅通知通道
+     * @param int    $expireSeconds 有效期（60-2592000）
+     */
+    public function bindQr(
+        string $externalType,
+        string $externalId,
+        string $externalName = '',
+        string $appId = '',
+        int $expireSeconds = 600
+    ): array {
+        $externalType = trim($externalType);
+        $externalId   = trim($externalId);
+
+        if ($externalType === '' || $externalId === '') {
+            return $this->fail(self::BIZ_INVALID_REQUEST, 'external_type 与 external_id 不能为空', 400);
+        }
+
+        $payload = [
+            'external_type'  => $externalType,
+            'external_id'    => $externalId,
+            'expire_seconds' => max(60, min(2592000, $expireSeconds)),
+        ];
+        if ($externalName !== '') {
+            $payload['external_name'] = $externalName;
+        }
+        if ($appId !== '') {
+            $payload['app_id'] = $appId;
+        }
+
+        return $this->request('POST', '/api/v1/bind/qrcode', [], $payload);
+    }
+
+    /** 查询扫码进度：waiting / bound / expired / invalid。 */
+    public function bindStatus(string $scene): array
+    {
+        $scene = trim($scene);
+        if ($scene === '') {
+            return $this->fail(self::BIZ_INVALID_REQUEST, 'scene 不能为空', 400);
+        }
+
+        return $this->request('GET', '/api/v1/bind/status', ['scene' => $scene]);
+    }
+
+    /**
+     * 查询绑定关系列表。
+     *
+     * @param array{external_type?:string,external_id?:string,status?:string,page?:int,limit?:int} $filters
+     */
+    public function bindList(array $filters = []): array
+    {
+        return $this->request('GET', '/api/v1/bind/list', $filters);
+    }
+
+    /** 解绑一条绑定关系。 */
+    public function bindUnbind(int $id): array
+    {
+        if ($id <= 0) {
+            return $this->fail(self::BIZ_INVALID_REQUEST, '绑定记录 id 不能为空', 400);
+        }
+
+        return $this->request('POST', '/api/v1/bind/unbind', [], ['id' => $id]);
+    }
+
+    /**
+     * 按外部对象反查可用 openid。
+     *
+     * @return array{count:int,openids:array}
+     */
+    public function bindResolve(string $externalType, string $externalId): array
+    {
+        $externalType = trim($externalType);
+        $externalId   = trim($externalId);
+
+        if ($externalType === '' || $externalId === '') {
+            return $this->fail(self::BIZ_INVALID_REQUEST, 'external_type 与 external_id 不能为空', 400);
+        }
+
+        return $this->request('POST', '/api/v1/bind/resolve', [], [
+            'external_type' => $externalType,
+            'external_id'   => $externalId,
+        ]);
+    }
+
+    /**
      * 组装并发送请求，把响应归一化为固定结构
      */
     protected function request(string $method, string $path, array $query = [], ?array $body = null): array

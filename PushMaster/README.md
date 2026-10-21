@@ -167,6 +167,27 @@ X-Push-Signature: sha256=...
 
 投递失败按 30、120、300 秒退避重试，重试用尽只记日志，不影响任务状态。
 
+## 扫码绑定 openid
+
+多系统共用同一个服务号时，openid 由网关统一维护，业务系统只维护自己的外部对象标识。
+
+```php
+$qr = $client->bindQr('tenant', '42', '示例租户');
+// $qr['data'] = ['scene' => ..., 'qr_url' => ..., 'expires_in' => 600, 'expire_at' => ...]
+
+$status = $client->bindStatus($qr['data']['scene']);
+// waiting / bound / expired / invalid
+
+$list = $client->bindList(['external_type' => 'tenant', 'external_id' => '42']);
+
+$resolved = $client->bindResolve('tenant', '42');
+// $resolved['data']['openids'] 可直接用于推送的 options.touser
+
+$client->bindUnbind($id);
+```
+
+绑定成功、解绑、取关会异步回调到 `saveWebhook()` 配置的地址，事件为 `bind.created`、`bind.updated`、`bind.removed`，签名规则与任务回调一致。
+
 ## 通道标识
 
 | 标识 | 通道 | 可覆盖的 options |
@@ -184,6 +205,11 @@ X-Push-Signature: sha256=...
 键名包含 `secret`、`pass`、`token`、`api_key`、`encoding_aes_key` 的值不会落库，只用于本次投递。
 
 ## 升级说明
+
+1.5.0 起：
+
+- 新增扫码绑定方法 `bindQr`、`bindStatus`、`bindList`、`bindUnbind`、`bindResolve`；
+- 对应网关接口 `/api/v1/bind/*`，绑定事件通过结果回调下发。
 
 1.4.0 起：
 
